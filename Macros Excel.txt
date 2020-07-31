@@ -1,0 +1,101 @@
+Sub FILTRO_BD()
+'
+' FILTRO_BD Macro
+' Filtrar busqueda documentos internos Andreu
+'
+
+    Range("BD").AdvancedFilter Action:=xlFilterCopy, CriteriaRange:=Range( _
+        "B22:G23"), CopyToRange:=Range("A33:H33"), Unique:=False
+    Range("B23:G23").Select
+    Selection.ClearContents
+    
+End Sub
+
+
+Sub BORRAR_REPETIDOS()
+
+    Dim fila As Long
+
+    For fila = Cells(Rows.Count, 1).End(xlUp).Row To 1 Step -1
+        If WorksheetFunction.CountIf(Columns(1), Cells(fila, 1)) > 1 Then
+            Cells(fila, 1).EntireRow.Delete
+        End If
+    Next fila
+
+End Sub
+
+Sub FILTRO_BD_Y_BORRAR_REPETIDOS()
+'
+' FILTRO_BD Macro
+' Filtrar busqueda documentos internos Andreu
+'
+
+    Dim fila As Long
+
+    Range("BD").AdvancedFilter Action:=xlFilterCopy, CriteriaRange:=Range( _
+        "B22:G23"), CopyToRange:=Range("A33:H33"), Unique:=False
+    Range("B23:G23").Select
+    Selection.ClearContents
+    
+    For fila = Cells(Rows.Count, 1).End(xlUp).Row To 1 Step -1
+        If WorksheetFunction.CountIf(Columns(1), Cells(fila, 1)) > 1 Then
+            Cells(fila, 1).EntireRow.Delete
+        End If
+    Next fila
+    
+End Sub
+
+Sub FILTRO_Y_ACTUALIZAR_CELDAS_CON_VÍNCULOS()
+'
+' FILTRO_BD Macro
+' Filtrar busqueda documentos internos Andreu
+'
+
+'
+    Range("CALIDAD").AdvancedFilter Action:=xlFilterCopy, CriteriaRange:=Range( _
+        "A4:F5"), CopyToRange:=Range("A9:H9"), Unique:=False
+    Range("A5:F5").Select
+    Selection.ClearContents
+    Dim condition As Boolean
+    condition = True
+    Dim condition2 As Boolean
+    condition2 = True
+    Dim i As Integer
+    i = 10
+    Dim f As Integer
+    f = 2
+    Do While condition = True
+        If IsEmpty(Worksheets("CALIDAD").Cells(i, 1).Value) = False Then
+                Do While condition2 = True
+                    If IsEmpty(Worksheets("BD_CALIDAD").Cells(f, 2).Value) = False Then
+                            If Worksheets("CALIDAD").Cells(i, 1).Value = Worksheets("BD_CALIDAD").Cells(f, 2).Value Then
+                                Worksheets("CALIDAD").Cells(i, 2) = Worksheets("BD_CALIDAD").Cells(f, 3)
+                                    If IsEmpty(Worksheets("BD_CALIDAD").Cells(f, 3).Value) = False Then
+                                        Worksheets("CALIDAD").Hyperlinks.Add Cells(i, 2), address:=GetURL(Worksheets("BD_CALIDAD").Cells(f, 3))
+                                        Else: Worksheets("CALIDAD").Cells(i, 2).ClearHyperlinks
+                                    End If
+                                Exit Do
+                                Else: f = f + 1
+                            End If
+                        Else: condition2 = False
+                    End If
+                Loop
+                i = i + 1
+                f = 2
+            Else: condition = False
+        End If
+    Loop
+End Sub
+
+MACRO_EXTRAER_VÍNCULO_DE_CELDA
+
+Function GetURL(cell As Range, _
+Optional default_value As Variant)
+'Lists the Hyperlink Address for a Given Cell
+'If cell does not contain a hyperlink, return default_value
+If (cell.Range("A1").Hyperlinks.Count <> 1) Then
+GetURL = default_value
+Else
+GetURL = cell.Range("A1").Hyperlinks(1).address & "#" & cell.Range("A1").Hyperlinks(1).SubAddress
+End If
+End Function
